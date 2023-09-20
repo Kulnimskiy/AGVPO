@@ -12,6 +12,7 @@ class CostFile:
             wb = load_workbook(self.path)
             ws = wb.active
             ws["A2"].value = diameter
+            ws["B2"].value = ""
             wb.save(self.path)
             wb.close()
         except Exception as error:
