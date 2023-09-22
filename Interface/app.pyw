@@ -7,10 +7,11 @@ from time import sleep
 
 def finish():
     global the
+    global closed
+    closed = True
     lbl.configure(text="Покеда")
     print("Закрытие приложения")
     sleep(4)
-    main_window.destroy()  # ручное закрытие окна и всего приложения
     
 
 main_window = Tk()
@@ -23,5 +24,8 @@ lbl.grid(column=0, row=0)
 btn = Button(main_window, text="Сделай спецификацию",fg="black", bg="white", command= PO.main, font=("Arial Black", 25))
 btn.grid(column=0, row=1)
 main_window.title("AGV automation")
+closed = False
 main_window.protocol("WM_DELETE_WINDOW", finish)
+if closed:
+    main_window.destroy()  # ручное закрытие окна и всего приложения
 mainloop()
