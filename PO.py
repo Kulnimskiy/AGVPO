@@ -56,3 +56,6 @@ def main():
         print(error)
     destination_dir = askdirectory(title="Куда сохранить PO")
     po.save(f"{destination_dir}\PO.xlsx")
+
+if __name__ == "__main__":
+    main()
