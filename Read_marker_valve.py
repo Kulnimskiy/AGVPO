@@ -133,7 +133,7 @@ class Dereference_Marker:
                 return int(self.all_parameters[index_char + 1:])
 
 
-def main():
+def description():
     while True:
         mark = Dereference_Marker(input("Дай мне маркер: "))
         print(f"Тип компрессора: {mark.nvk}")
@@ -159,8 +159,15 @@ def main():
                 f"{mark.nvk} клапан d{mark.diameter_num} мм {mark.full_name} {mark.stage_num}-й ступени компрессора {mark.compressor}, давление всасывания -  {pressure} кгс/см2, конечный заказчик - {mark.company.company_name}.")
             print()
 
-def test():
-    print(DataBase().find_client_number(input("Введите имя клиента: ")))
+def find_client():
+    db = DataBase()
+    print(numb := db.find_client_number(input("Введите имя клиента: ")))
+    if numb is None:
+        print("Нет клиента")
+        return
+    for compr in db.find_compressors(numb[0]):
+        print(f"{compr[0]}, ид. номер {compr[1]}")
 
 if __name__ == '__main__':
-    main()
+    while True:
+        find_client()
