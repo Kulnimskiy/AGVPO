@@ -170,4 +170,7 @@ def find_client():
 
 if __name__ == '__main__':
     while True:
-        find_client()
+        try:
+            find_client()
+        except Exception as error:
+            print(error)

@@ -92,15 +92,22 @@ class Specification:
             quantity_index = None
             for row in self.table:
                 for cell in row:
-                    if "наименование" in cell.lower():
+                    if "наименование" in cell.lower() and "агв" in cell.lower():
                         name_index = row.index(cell)
                         header_index = self.table.index(row)
-                    if "кол" in cell.lower():
+                        print(cell)
+                        break
+                if name_index is not None:
+                    break
+            for row in self.table:
+                for cell in row:
+                    if header_index is not None and "кол" in cell.lower() and row.index(cell) > name_index:
                         quantity_index = row.index(cell)
-                if name_index is not None and quantity_index is not None:
+                        print("кол-во " + cell.lower())
+                if quantity_index is not None:
                     break
             if name_index is None or quantity_index is None:
-                raise IndexError("В таблице нет наименования или количества!")
+                raise IndexError("В таблице нет столца с названием 'Наименование АГВ' или количества!")
             for row in range(header_index + 1, len(self.table)):
                 name = str(self.table[row][name_index])
                 quantity = ""
@@ -109,7 +116,7 @@ class Specification:
                         quantity += i
                     else:
                         break
-                quantity = float(quantity)
+                quantity = float(quantity) if quantity != "" else 0
                 items.append((name, quantity))
             print("Кол-во пунктов в спецификации", len(items))
             return items
@@ -117,12 +124,23 @@ class Specification:
             print(dang_it)
 
     def get_items(self):
+        goods = ["Прокладка","Уплотнение","Кольцо","Шайба","Фильтр","Клапан"]
         for specification_agv_name in self.items_name_quant:
+            item_name = specification_agv_name[0].lower()
+            if item_name is None:
+                Specification._items.append(None)
+                return
             zip_valve_triggers = ["зип","ремонт"]
             if "клапан" in specification_agv_name[0].lower() and any(trigger in specification_agv_name[0].lower() for trigger in zip_valve_triggers):
-                Specification._items.append(ZipValve(specification_agv_name[0]))
+                analize_goods = goods.copy()
+                analize_goods.remove("Клапан")
+                if all(good.lower() not in specification_agv_name[0].lower() for good in analize_goods):
+                    Specification._items.append(ZipValve(specification_agv_name[0]))
             elif "клапан" in specification_agv_name[0].lower() and all(trigger not in specification_agv_name[0].lower() for trigger in zip_valve_triggers):
-                Specification._items.append(Valve(specification_agv_name[0]))
+                analize_goods = goods.copy()
+                analize_goods.remove("Клапан")
+                if all(good.lower() not in specification_agv_name[0].lower() for good in analize_goods):
+                    Specification._items.append(Valve(specification_agv_name[0]))
             else:
                 Specification._items.append(None)
 
