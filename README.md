@@ -1,1 +1,1 @@
-*All the projects are stored on different branches*
+*Reads your outlook and gathers all the resume into one csv file*
