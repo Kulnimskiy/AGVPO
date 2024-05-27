@@ -1,1 +1,0 @@
-*All the projects are stored on different branches*
