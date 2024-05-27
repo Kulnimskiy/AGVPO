@@ -1,6 +1,21 @@
 import pandas as pd
 from File_search import Files
 
+LATTERS_TRANSKRIPTION = { # Перевод русских букв на похожие по форме английские если такое было
+    "А": "A",
+    "В": "B",
+    "Е": "E",
+    "К": "K",
+    "М": "M",
+    "Н": "H",
+    "О": "O",
+    "Р": "P",
+    "С": "C",
+    "Т": "T",
+    "У": "Y",
+    "Х": "X",
+}
+
 class DataBase:
     def __init__(self) -> None:
         self.base_path = "\\\PUBLIC\\Users\\Public-AGV\\Клиентская база\\Клиентская база с порядковыми номерами.xlsx"
@@ -10,7 +25,7 @@ class DataBase:
             database = pd.read_excel(self.base_path)
             for i in range(database.shape[0]):  # кол-во рядов
                 if client_name.lower() in str(database["Клиент"][i]).lower():
-                    #print(database["Клиент"][i], int(database["Идентификатор клиента"][i]))
+                    # print(database["Клиент"][i], int(database["Идентификатор клиента"][i]))
                     return int(database["Идентификатор клиента"][i]), str(database["Клиент"][i])
         except Exception as error:
             print(error)
@@ -21,7 +36,7 @@ class DataBase:
             item = float(client_number)
             for i in range(database.shape[0]):
                 if item == database["Идентификатор клиента"][i]:
-                    #print(database["Клиент"][i], int(database["Идентификатор клиента"][i]))
+                    # print(database["Клиент"][i], int(database["Идентификатор клиента"][i]))
                     return str(database["Клиент"][i])
         except Exception as error:
             print(error)
@@ -94,14 +109,19 @@ class Dereference_Marker:
                     char_index = self.all_parameters.index(i)
                     if i.isalpha() and self.all_parameters[char_index + 1].isalpha():
                         row = self.all_parameters[char_index: char_index + 2]
-                        colomn = int(self.all_parameters[char_index + 2 : -7])
+                        colomn = int(self.all_parameters[char_index + 2: -7])
+                        if row in LATTERS_TRANSKRIPTION.keys():
+                            row = LATTERS_TRANSKRIPTION[row]
                         diameter_index = (row, colomn)
                         break
                     if i.isalpha():
                         row = self.all_parameters[char_index]
                         column = ""
-                        colomn = int(self.all_parameters[char_index + 1 : -7])
+                        colomn = int(self.all_parameters[char_index + 1: -7])
+                        if row in LATTERS_TRANSKRIPTION.keys():
+                            row = LATTERS_TRANSKRIPTION[row]
                         diameter_index = (row, colomn)
+
                 for i in file.readlines():
                     diameters.append(i.split())
                 for i in diameters:
@@ -115,8 +135,8 @@ class Dereference_Marker:
 
     def get_company_num(self):
         for i in self.all_parameters[::-1]:  # разворачиваем и ищем с конца букву
-            return int(self.all_parameters[-7 : -4])
-    
+            return int(self.all_parameters[-7: -4])
+
     def get_compressor_num(self):
         for i in self.all_parameters:  # разворачиваем и ищем с конца букву
             if i == ".":
@@ -133,11 +153,11 @@ class Dereference_Marker:
                 return int(self.all_parameters[index_char + 1:])
 
 
-def main():
+def description():
     while True:
         mark = Dereference_Marker(input("Дай мне маркер: "))
-        print(f"Тип компрессора: {mark.nvk}")
-        print(f"Тип компрессора: {mark.kdpg}")
+        print(f"Тип клапана: {mark.nvk}")
+        print(f"Вид клапана: {mark.kdpg}")
         print(f"Диаметр: {mark.diameter_num} мм")
         print(f"Компания: {mark.company.company_name}")
         print(f"Идентификационный номер компании: {mark.company.code}")
@@ -159,8 +179,20 @@ def main():
                 f"{mark.nvk} клапан d{mark.diameter_num} мм {mark.full_name} {mark.stage_num}-й ступени компрессора {mark.compressor}, давление всасывания -  {pressure} кгс/см2, конечный заказчик - {mark.company.company_name}.")
             print()
 
-def test():
-    print(DataBase().find_client_number(input("Введите имя клиента: ")))
+
+def find_client():
+    db = DataBase()
+    print(numb := db.find_client_number(input("Введите имя клиента: ")))
+    if numb is None:
+        print("Нет клиента")
+        return
+    for compr in db.find_compressors(numb[0]):
+        print(f"{compr[0]}, ид. номер {compr[1]}")
+
 
 if __name__ == '__main__':
-    main()
+    while True:
+        try:
+            description()
+        except Exception as error:
+            print(error)
