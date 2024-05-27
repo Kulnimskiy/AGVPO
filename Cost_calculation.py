@@ -2,12 +2,15 @@ from openpyxl import load_workbook, Workbook
 import xlwings
 from File_search import Files
 
+
 class CostFile:
     def __init__(self):
         self.path = Files().file_cost_path
 
     def write_diameter(self, diameter):
-        """диаметер для расчета в ячейке А2"""
+        """Устанавливаем диаметер для расчета в ячейке А2
+        и убираем значение в ячейке В2 чтобы наличие РУ определялось
+        самой программой"""
         try:
             wb = load_workbook(self.path)
             ws = wb.active
@@ -37,7 +40,6 @@ class CostFile:
         ws = wb.active
         return ws["C2"].value
 
-
     def get_cost_zip(self, diameter):
         """Значения подставляем и в фоновом режиме открываем и закрываем приложение,
         чтобы после подстановки формулы экселевские сами посчиталисm"""
@@ -46,7 +48,6 @@ class CostFile:
         wb = load_workbook(self.path, data_only=True)
         ws = wb.active
         return ws["D2"].value
-
 
     def get_all_prices(self, min_diam, max_diam):
         all_prices = []
@@ -77,10 +78,14 @@ class CostFile:
 
 
 def main():
-    diameters = [122, 86, 118, 145, 240, 300, 169]
-    costs = CostFile()
-    for diameter in diameters:
-        print(costs.get_cost_zip(diameter))
+    try:
+        diameter = input("Введите расчетный диаметр: ")
+        diameters = [int(diameter)]
+        costs = CostFile()
+        for diameter in diameters:
+            print(costs.get_cost_zip(diameter))
+    except Exception as error:
+        print(error)
 
 
 if __name__ == '__main__':

@@ -6,7 +6,7 @@ from Cost_calculation import CostFile
 
 
 class Specification:
-    _items = [] # хранит классы товаров и None если он его не знает
+    _items = []  # хранит классы товаров и None если он его не знает
 
     # Спецификация должна быть в формате docx и сама таблица с товарами должна быть первой
     def __init__(self, spec_path=None) -> None:
@@ -124,19 +124,21 @@ class Specification:
             print(dang_it)
 
     def get_items(self):
-        goods = ["Прокладка","Уплотнение","Кольцо","Шайба","Фильтр","Клапан"]
+        goods = ["Прокладка", "Уплотнение", "Кольцо", "Шайба", "Фильтр", "Клапан"]
         for specification_agv_name in self.items_name_quant:
             item_name = specification_agv_name[0].lower()
             if item_name is None:
                 Specification._items.append(None)
                 return
-            zip_valve_triggers = ["зип","ремонт"]
-            if "клапан" in specification_agv_name[0].lower() and any(trigger in specification_agv_name[0].lower() for trigger in zip_valve_triggers):
+            zip_valve_triggers = ["зип", "ремонт"]
+            if "клапан" in specification_agv_name[0].lower() and any(
+                    trigger in specification_agv_name[0].lower() for trigger in zip_valve_triggers):
                 analize_goods = goods.copy()
                 analize_goods.remove("Клапан")
                 if all(good.lower() not in specification_agv_name[0].lower() for good in analize_goods):
                     Specification._items.append(ZipValve(specification_agv_name[0]))
-            elif "клапан" in specification_agv_name[0].lower() and all(trigger not in specification_agv_name[0].lower() for trigger in zip_valve_triggers):
+            elif "клапан" in specification_agv_name[0].lower() and all(
+                    trigger not in specification_agv_name[0].lower() for trigger in zip_valve_triggers):
                 analize_goods = goods.copy()
                 analize_goods.remove("Клапан")
                 if all(good.lower() not in specification_agv_name[0].lower() for good in analize_goods):
@@ -203,13 +205,13 @@ class Valve:
     @staticmethod
     def there_reg_device(specification_agv_name):
         """Разные раскладки английская и русская дя одних и тех же сочетаний"""
-        there_is = ["с ру","c ру", "c pу","с py","c py"," ру ", "с регулирующим устройством"]
+        there_is = ["с ру", "c ру", "c pу", "с py", "c py", " ру ", "с регулирующим устройством"]
         if any(i in specification_agv_name.lower() for i in there_is):
             return "с РУ "
         else:
             return ""
 
-    def cal_cost(self,diameter):
+    def cal_cost(self, diameter):
         valve_cost = CostFile().get_cost_valve(self.parameters.diameter_num)
         if valve_cost == "нет такого диаметра":
             valve_cost = CostFile().get_cost_valve(85)
@@ -283,24 +285,26 @@ def main():
     Tk().withdraw()  # we don't want a full GUI, so keep the root window from appearing
     filename = askopenfilename()  # show an "Open" dialog box and return the path to the selected file
     spec = Specification(filename)
-    #Результат пока в текстовый файлик запишу
+    # Результат пока в текстовый файлик запишу
     try:
-        with open("C:\\Users\\sk\\Desktop\\АГВ Проекты\\АГВ проектыV2\\АвтоПО\\new_file.txt", "w", encoding="utf-8") as file:
+        with open("C:\\Users\\sk\\Desktop\\АГВ Проекты\\АГВ проектыV2\\АвтоПО\\new_file.txt", "w",
+                  encoding="utf-8") as file:
             counter = 0
             for i in spec._items:
                 if i is None:
-                    counter +=1
-                    file.write(f"№ {counter} {spec.items_name_quant[counter-1]} -  Его не знаю еще\n")
+                    counter += 1
+                    file.write(f"№ {counter} {spec.items_name_quant[counter - 1]} -  Его не знаю еще\n")
                 else:
-                    counter +=1
+                    counter += 1
                     file.write(f"№ {counter}, {i.description} ({i.name}, {i.marker})\n")
     except Exception as error:
         print(error)
 
+
 def test():
     while True:
         print(Valve.there_reg_device(input("Описание: ")))
-        input()    
+        input()
 
 
 if __name__ == "__main__":
